@@ -80,11 +80,11 @@ export default function Home() {
                     { data: gallery }
                 ] = await Promise.all([
                     supabase.from('profiles').select('*').single(),
-                    supabase.from('projects').select('*').order('order', { ascending: true }),
+                    supabase.from('projects').select('*').order('created_at', { ascending: false }),
                     supabase.from('experience').select('*').order('created_at', { ascending: false }),
                     supabase.from('education').select('*').order('created_at', { ascending: false }),
                     supabase.from('skills').select('*').order('id'),
-                    supabase.from('certificates').select('*').order('id'),
+                    supabase.from('certificates').select('*').order('created_at', { ascending: false }),
                     supabase.from('gallery').select('*').order('created_at', { ascending: false })
                 ]);
 
