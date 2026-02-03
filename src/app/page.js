@@ -118,7 +118,7 @@ export default function Home() {
         const trackVisit = async () => {
             try {
                 await supabase.from('analytics').insert({
-                    type: 'visit',
+                    type: 'page_view',
                     details: { page: 'portfolio', referrer: document.referrer, user_agent: navigator.userAgent }
                 });
             } catch (err) {
@@ -127,6 +127,13 @@ export default function Home() {
         };
         trackVisit();
     }, []);
+
+    const trackProjectClick = (project, type) => {
+        supabase.from('analytics').insert({
+            type: 'project_view',
+            details: { title: project.title, link: type }
+        }).then(() => { });
+    };
 
     const handleFormSubmit = async (e) => {
         e.preventDefault();
@@ -394,8 +401,8 @@ export default function Home() {
                                     <div style={{ position: 'relative' }}>
                                         <figure className="project-img">
                                             <div className="project-icons">
-                                                {p.github_link && <a href={p.github_link} target="_blank" className="project-icon-link"><Github size={20} /></a>}
-                                                {p.live_link && <a href={p.live_link} target="_blank" className="project-icon-link"><ExternalLink size={20} /></a>}
+                                                {p.github_link && <a href={p.github_link} target="_blank" className="project-icon-link" onClick={() => trackProjectClick(p, 'github')}><Github size={20} /></a>}
+                                                {p.live_link && <a href={p.live_link} target="_blank" className="project-icon-link" onClick={() => trackProjectClick(p, 'live')}><ExternalLink size={20} /></a>}
                                             </div>
                                             <img src={p.image_url} alt={p.title} loading="lazy" />
                                         </figure>
