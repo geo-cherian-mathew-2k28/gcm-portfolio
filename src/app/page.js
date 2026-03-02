@@ -1,6 +1,6 @@
 'use client';
 import { useState, useEffect } from 'react';
-import { supabase } from '../utils/supabase';
+import { supabase, getProxiedStorageUrl } from '../utils/supabase';
 import {
     Mail, Smartphone, Calendar, MapPin, Github, Linkedin, Instagram,
     ExternalLink, Download, BookOpen, Briefcase, Send, ChevronDown, X,
@@ -173,7 +173,7 @@ export default function Home() {
                 <div className="sidebar-info">
                     <figure className="avatar-box" onClick={() => setIsAvatarFlipped(!isAvatarFlipped)} style={{ cursor: 'pointer' }}>
                         <img
-                            src={isAvatarFlipped ? "/assets/images/highlights/avatar-2.png" : (data.profile?.avatar_url || "/assets/images/geo6.jpg")}
+                            src={isAvatarFlipped ? "/assets/images/highlights/avatar-2.png" : (getProxiedStorageUrl(data.profile?.avatar_url) || "/assets/images/geo6.jpg")}
                             alt="Profile"
                             loading="lazy"
                         />
@@ -404,7 +404,7 @@ export default function Home() {
                                                 {p.github_link && <a href={p.github_link} target="_blank" className="project-icon-link" onClick={() => trackProjectClick(p, 'github')}><Github size={20} /></a>}
                                                 {p.live_link && <a href={p.live_link} target="_blank" className="project-icon-link" onClick={() => trackProjectClick(p, 'live')}><ExternalLink size={20} /></a>}
                                             </div>
-                                            <img src={p.image_url} alt={p.title} loading="lazy" />
+                                            <img src={getProxiedStorageUrl(p.image_url)} alt={p.title} loading="lazy" />
                                         </figure>
                                         <h3 className="project-title">{p.title}</h3>
                                         <p className="project-category">{p.description || p.category}</p>
@@ -453,8 +453,8 @@ export default function Home() {
                     <ul className="project-list">
                         {filteredCertificates.length > 0 ? (
                             filteredCertificates.map(c => (
-                                <li key={c.id} className="project-item active" onClick={() => setLightboxImage(c.image_url)}>
-                                    <figure className="project-img" style={{ cursor: 'pointer' }}><img src={c.image_url} alt={c.title} /></figure>
+                                <li key={c.id} className="project-item active" onClick={() => setLightboxImage(getProxiedStorageUrl(c.image_url))}>
+                                    <figure className="project-img" style={{ cursor: 'pointer' }}><img src={getProxiedStorageUrl(c.image_url)} alt={c.title} /></figure>
                                     <h3 className="project-title">{c.title}</h3>
                                     <p className="project-category">{c.description || c.issuer}</p>
                                 </li>
@@ -473,8 +473,8 @@ export default function Home() {
                     <header><h2 className="h2 article-title">Gallery</h2></header>
                     <ul className="project-list">
                         {data.gallery.map(item => (
-                            <li key={item.id} className="project-item active" onClick={() => setLightboxImage(item.image_url)}>
-                                <figure className="project-img" style={{ cursor: 'pointer' }}><img src={item.image_url} alt="Gallery item" /></figure>
+                            <li key={item.id} className="project-item active" onClick={() => setLightboxImage(getProxiedStorageUrl(item.image_url))}>
+                                <figure className="project-img" style={{ cursor: 'pointer' }}><img src={getProxiedStorageUrl(item.image_url)} alt="Gallery item" /></figure>
                             </li>
                         ))}
                     </ul>
