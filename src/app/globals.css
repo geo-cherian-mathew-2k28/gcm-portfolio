@@ -2557,29 +2557,37 @@ textarea.form-input::-webkit-resizer {
     letter-spacing: 0.2px !important;
   }
 }
+
 /* FIX: Profile Spacing (Tighter) */
 .info-content {
-  margin-top: 5px !important; /* Reduced from 15px */
+  margin-top: 5px !important;
+  /* Reduced from 15px */
 }
 
 .info-content .name {
-  margin-bottom: 5px !important; /* Reduced from 10px */
+  margin-bottom: 5px !important;
+  /* Reduced from 10px */
 }
 
 .info-content .title {
   margin-top: 5px !important;
-  font-size: 11px !important; /* Slightly smaller for professional look */
+  font-size: 11px !important;
+  /* Slightly smaller for professional look */
   padding: 4px 12px !important;
 }
 
 /* FIX: Resume Button Mobile */
 @media (max-width: 450px) {
   .download-btn span {
-    display: none; /* Hide text on very small screens to save space */
+    display: none;
+    /* Hide text on very small screens to save space */
   }
+
   .download-btn {
-    padding: 8px !important; /* Square button */
+    padding: 8px !important;
+    /* Square button */
   }
+
   .download-btn svg {
     margin: 0 !important;
   }
@@ -2587,30 +2595,37 @@ textarea.form-input::-webkit-resizer {
 
 /* FIX: Perfect Spacing (Name centered between Avatar and Role) */
 .info-content {
-  margin-top: 15px !important; /* Space above Name */
+  margin-top: 15px !important;
+  /* Space above Name */
 }
 
 .info-content .name {
-  margin-bottom: 15px !important; /* Space below Name */
+  margin-bottom: 15px !important;
+  /* Space below Name */
 }
 
 /* FIX: Role Font Size (+2px) */
 .info-content .title {
-  font-size: 13px !important; /* Increased from 11px */
-  padding: 5px 15px !important; /* Adjusted padding for larger text */
+  font-size: 13px !important;
+  /* Increased from 11px */
+  padding: 5px 15px !important;
+  /* Adjusted padding for larger text */
 }
 
 /* FIX: TRUE Equal Spacing (Avatar-Name vs Name-Role) */
 .sidebar-info {
-  gap: 15px !important; /* Space Avatar -> Name Block */
+  gap: 15px !important;
+  /* Space Avatar -> Name Block */
 }
 
 .info-content {
-  margin-top: 0 !important; /* Remove extra margin */
+  margin-top: 0 !important;
+  /* Remove extra margin */
 }
 
 .info-content .name {
-  margin-bottom: 15px !important; /* Space Name -> Role */
+  margin-bottom: 15px !important;
+  /* Space Name -> Role */
   line-height: 1.2 !important;
 }
 
@@ -2631,10 +2646,12 @@ textarea.form-input::-webkit-resizer {
     align-items: stretch !important;
     gap: 15px !important;
   }
+
   .download-btn {
     width: 100% !important;
     justify-content: center !important;
   }
+
   .education-title-group {
     width: 100% !important;
   }
@@ -2642,8 +2659,10 @@ textarea.form-input::-webkit-resizer {
 
 /* FIX: Name Spacing - Increase distance from Avatar ("Single Unit Down") */
 .info-content {
-  margin-top: 25px !important; /* Increased from 15px/0px */
+  margin-top: 25px !important;
+  /* Increased from 15px/0px */
 }
+
 /* Ensure Name-Role distance stays clean */
 .info-content .name {
   margin-bottom: 15px !important;
@@ -2652,25 +2671,33 @@ textarea.form-input::-webkit-resizer {
 /* FIX: Resume Button Mobile Cleaner */
 @media (max-width: 700px) {
   .education-header {
-    flex-direction: row !important; /* Keep side by side */
+    flex-direction: row !important;
+    /* Keep side by side */
     align-items: center !important;
     gap: 10px !important;
   }
+
   .download-btn {
-    width: auto !important; /* Not full width */
+    width: auto !important;
+    /* Not full width */
     padding: 6px 10px !important;
     font-size: 11px !important;
   }
+
   .download-btn span {
-    display: inline !important; /* Show text again */
+    display: inline !important;
+    /* Show text again */
   }
+
   .download-btn svg {
     margin-right: 5px !important;
     width: 14px !important;
     height: 14px !important;
   }
+
   .h3 {
-    font-size: 16px !important; /* Sligthly smaller title */
+    font-size: 16px !important;
+    /* Sligthly smaller title */
     margin: 0 !important;
   }
 }
@@ -2678,18 +2705,20 @@ textarea.form-input::-webkit-resizer {
 /* FIX: Navbar Spacing (Avoid Overlap) */
 @media (max-width: 1024px) {
   .navbar-list {
-    padding-left: 0 !important; /* Reset */
+    padding-left: 0 !important;
+    /* Reset */
     justify-content: center !important;
     gap: 10px !important;
-    overflow-x: auto !important; /* Scroll if needed */
+    overflow-x: auto !important;
+    /* Scroll if needed */
   }
-  
+
   .navbar-link {
     font-size: 10px !important;
     padding: 6px 8px !important;
     white-space: nowrap !important;
   }
-  
+
   /* Hide scrollbar */
   .navbar-list::-webkit-scrollbar {
     display: none;
@@ -2700,14 +2729,17 @@ textarea.form-input::-webkit-resizer {
 @media (max-width: 700px) {
   .education-header {
     display: flex !important;
-    flex-direction: column-reverse !important; /* Button moves to TOP */
-    align-items: flex-start !important; /* Align left */
+    flex-direction: column-reverse !important;
+    /* Button moves to TOP */
+    align-items: flex-start !important;
+    /* Align left */
     gap: 15px !important;
     margin-bottom: 25px !important;
   }
-  
+
   .download-btn {
-    width: 100% !important; /* Full width for easy tap */
+    width: 100% !important;
+    /* Full width for easy tap */
     max-width: 300px;
     justify-content: center !important;
     background: var(--bg-gradient-yellow-1) !important;
@@ -2715,7 +2747,7 @@ textarea.form-input::-webkit-resizer {
     border: 1px solid var(--orange-yellow-crayola) !important;
     margin-bottom: 5px !important;
   }
-  
+
   /* Ensure Title doesn't float weirdly */
   .education-title-group {
     width: 100% !important;
@@ -2727,22 +2759,25 @@ textarea.form-input::-webkit-resizer {
   .download-btn {
     width: auto !important;
     max-width: none !important;
-    background: transparent !important; /* No heavy fill */
-    border: 1px solid var(--orange-yellow-crayola) !important; /* Clean outline */
+    background: transparent !important;
+    /* No heavy fill */
+    border: 1px solid var(--orange-yellow-crayola) !important;
+    /* Clean outline */
     color: var(--orange-yellow-crayola) !important;
     border-radius: 12px !important;
     padding: 8px 16px !important;
     margin-bottom: 0 !important;
     box-shadow: none !important;
   }
-  
+
   .education-header {
-    flex-direction: row !important; /* Side-by-side is cleaner */
+    flex-direction: row !important;
+    /* Side-by-side is cleaner */
     justify-content: space-between !important;
     align-items: center !important;
     gap: 10px !important;
   }
-  
+
   .education-title-group {
     width: auto !important;
   }
@@ -2751,14 +2786,57 @@ textarea.form-input::-webkit-resizer {
 /* FIX: Mobile Resume Button - STACKED ABOVE (Final) */
 @media (max-width: 700px) {
   .education-header {
-    flex-direction: column-reverse !important; /* Button moves to TOP */
-    align-items: flex-start !important; /* Align left */
+    flex-direction: column-reverse !important;
+    /* Button moves to TOP */
+    align-items: flex-start !important;
+    /* Align left */
     gap: 15px !important;
   }
-  
+
   /* Keep the sleek design */
   .download-btn {
-    width: auto !important; 
+    width: auto !important;
     margin-bottom: 5px !important;
   }
+}
+
+/*-----------------------------------*\
+  #SKELETON LOADER
+\*-----------------------------------*/
+
+@keyframes skeleton-shimmer {
+  0% {
+    background-position: -800px 0;
+  }
+
+  100% {
+    background-position: 800px 0;
+  }
+}
+
+.skeleton {
+  background: linear-gradient(90deg,
+      hsl(240, 2%, 15%) 25%,
+      hsl(240, 2%, 22%) 50%,
+      hsl(240, 2%, 15%) 75%);
+  background-size: 800px 100%;
+  animation: skeleton-shimmer 1.4s infinite linear;
+  border-radius: 8px;
+}
+
+.skeleton-round {
+  border-radius: 20px;
+}
+
+/*-----------------------------------*\
+  #IMAGE FADE-IN ON LOAD
+\*-----------------------------------*/
+
+.img-lazy {
+  opacity: 0;
+  transition: opacity 0.35s ease;
+}
+
+.img-lazy.loaded {
+  opacity: 1;
 }

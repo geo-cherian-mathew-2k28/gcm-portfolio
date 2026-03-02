@@ -110,8 +110,7 @@ export default function Home() {
             }
         }
         fetchData();
-        fetchData();
-    }, [activeTab]);
+    }, []);
 
     // Analytics Tracker
     useEffect(() => {
@@ -152,7 +151,49 @@ export default function Home() {
         }
     };
 
-    if (loading) return null;
+    if (loading) return (
+        <main className="skeleton-page">
+            {/* Sidebar skeleton */}
+            <aside className="sidebar">
+                <div className="sidebar-info">
+                    <figure className="avatar-box">
+                        <div className="skeleton skeleton-round" style={{ width: 80, height: 80 }} />
+                    </figure>
+                    <div className="info-content">
+                        <div className="skeleton" style={{ width: 140, height: 16, marginBottom: 10 }} />
+                        <div className="skeleton" style={{ width: 90, height: 11, borderRadius: 8 }} />
+                    </div>
+                </div>
+            </aside>
+
+            {/* Main content skeleton */}
+            <div className="main-content">
+                <nav className="navbar">
+                    <ul className="navbar-list">
+                        {['About', 'Resume', 'Projects', 'Certificates', 'Gallery', 'Contact'].map(t => (
+                            <li key={t} className="navbar-item">
+                                <button className="navbar-link">{t}</button>
+                            </li>
+                        ))}
+                    </ul>
+                </nav>
+                <article className="about active" style={{ padding: 20 }}>
+                    <div className="skeleton" style={{ width: 180, height: 24, marginBottom: 20 }} />
+                    {[100, 85, 92, 70].map((w, i) => (
+                        <div key={i} className="skeleton" style={{ width: `${w}%`, height: 13, marginBottom: 10 }} />
+                    ))}
+                    <div style={{ marginTop: 30 }}>
+                        <div className="skeleton" style={{ width: 150, height: 18, marginBottom: 20 }} />
+                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 15 }}>
+                            {[1, 2, 3, 4].map(i => (
+                                <div key={i} className="skeleton" style={{ height: 80, borderRadius: 14 }} />
+                            ))}
+                        </div>
+                    </div>
+                </article>
+            </div>
+        </main>
+    );
 
     const projectCategories = ['all', ...new Set(data.projects.map(p => p.category?.toLowerCase()).filter(Boolean))];
     const filteredProjects = projectFilter === 'all'
@@ -174,8 +215,12 @@ export default function Home() {
                     <figure className="avatar-box" onClick={() => setIsAvatarFlipped(!isAvatarFlipped)} style={{ cursor: 'pointer' }}>
                         <img
                             src={isAvatarFlipped ? "/assets/images/highlights/avatar-2.png" : (getProxiedStorageUrl(data.profile?.avatar_url) || "/assets/images/geo6.jpg")}
-                            alt="Profile"
-                            loading="lazy"
+                            alt={data.profile?.name || 'Profile'}
+                            width="80"
+                            height="80"
+                            fetchPriority="high"
+                            decoding="async"
+                            onError={(e) => { e.currentTarget.src = '/assets/images/geo6.jpg'; }}
                         />
                     </figure>
 
@@ -404,7 +449,15 @@ export default function Home() {
                                                 {p.github_link && <a href={p.github_link} target="_blank" className="project-icon-link" onClick={() => trackProjectClick(p, 'github')}><Github size={20} /></a>}
                                                 {p.live_link && <a href={p.live_link} target="_blank" className="project-icon-link" onClick={() => trackProjectClick(p, 'live')}><ExternalLink size={20} /></a>}
                                             </div>
-                                            <img src={getProxiedStorageUrl(p.image_url)} alt={p.title} loading="lazy" />
+                                            <img
+                                                src={getProxiedStorageUrl(p.image_url) || 'https://images.unsplash.com/photo-1518770660439-4636190af475?q=80&w=400'}
+                                                alt={p.title}
+                                                loading="lazy"
+                                                decoding="async"
+                                                className="img-lazy"
+                                                onLoad={(e) => e.currentTarget.classList.add('loaded')}
+                                                onError={(e) => { e.currentTarget.src = 'https://images.unsplash.com/photo-1518770660439-4636190af475?q=80&w=400'; e.currentTarget.classList.add('loaded'); }}
+                                            />
                                         </figure>
                                         <h3 className="project-title">{p.title}</h3>
                                         <p className="project-category">{p.description || p.category}</p>
@@ -453,8 +506,18 @@ export default function Home() {
                     <ul className="project-list">
                         {filteredCertificates.length > 0 ? (
                             filteredCertificates.map(c => (
-                                <li key={c.id} className="project-item active" onClick={() => setLightboxImage(getProxiedStorageUrl(c.image_url))}>
-                                    <figure className="project-img" style={{ cursor: 'pointer' }}><img src={getProxiedStorageUrl(c.image_url)} alt={c.title} /></figure>
+                                <li key={c.id} className="project-item active" onClick={() => getProxiedStorageUrl(c.image_url) && setLightboxImage(getProxiedStorageUrl(c.image_url))}>
+                                    <figure className="project-img" style={{ cursor: 'pointer' }}>
+                                        <img
+                                            src={getProxiedStorageUrl(c.image_url) || 'https://images.unsplash.com/photo-1589330694653-ded6df03f754?q=80&w=400'}
+                                            alt={c.title}
+                                            loading="lazy"
+                                            decoding="async"
+                                            className="img-lazy"
+                                            onLoad={(e) => e.currentTarget.classList.add('loaded')}
+                                            onError={(e) => { e.currentTarget.src = 'https://images.unsplash.com/photo-1589330694653-ded6df03f754?q=80&w=400'; e.currentTarget.classList.add('loaded'); }}
+                                        />
+                                    </figure>
                                     <h3 className="project-title">{c.title}</h3>
                                     <p className="project-category">{c.description || c.issuer}</p>
                                 </li>
@@ -473,8 +536,18 @@ export default function Home() {
                     <header><h2 className="h2 article-title">Gallery</h2></header>
                     <ul className="project-list">
                         {data.gallery.map(item => (
-                            <li key={item.id} className="project-item active" onClick={() => setLightboxImage(getProxiedStorageUrl(item.image_url))}>
-                                <figure className="project-img" style={{ cursor: 'pointer' }}><img src={getProxiedStorageUrl(item.image_url)} alt="Gallery item" /></figure>
+                            <li key={item.id} className="project-item active" onClick={() => getProxiedStorageUrl(item.image_url) && setLightboxImage(getProxiedStorageUrl(item.image_url))}>
+                                <figure className="project-img" style={{ cursor: 'pointer' }}>
+                                    <img
+                                        src={getProxiedStorageUrl(item.image_url)}
+                                        alt={item.caption || 'Gallery'}
+                                        loading="lazy"
+                                        decoding="async"
+                                        className="img-lazy"
+                                        onLoad={(e) => e.currentTarget.classList.add('loaded')}
+                                        onError={(e) => { e.currentTarget.style.display = 'none'; }}
+                                    />
+                                </figure>
                             </li>
                         ))}
                     </ul>
