@@ -4,7 +4,7 @@ const nextConfig = {
         remotePatterns: [
             {
                 protocol: 'https',
-                hostname: 'geodashboard.jiobase.com',
+                hostname: 'gcbppyetisfunawqzzjt.supabase.co',
                 port: '',
                 pathname: '/**',
             },
@@ -46,4 +46,3 @@ const nextConfig = {
 };
 
 module.exports = nextConfig;
-

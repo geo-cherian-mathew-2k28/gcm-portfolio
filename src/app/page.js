@@ -1,10 +1,10 @@
 'use client';
 import { useState, useEffect } from 'react';
-import { supabase, getProxiedStorageUrl } from '../utils/supabase';
+import { supabase, fetchPortfolioData } from '../utils/supabase';
 import {
     Mail, Smartphone, Calendar, MapPin, Github, Linkedin, Instagram,
     ExternalLink, Download, BookOpen, Briefcase, Send, ChevronDown, X,
-    Layout, Cpu, Globe, Server, Zap, Shield, Heart, Code
+    Layout, Cpu, Globe, Server, Zap, Shield, Heart, Code, AlertTriangle
 } from 'lucide-react';
 import { Toaster, toast } from 'react-hot-toast';
 
@@ -51,6 +51,7 @@ export default function Home() {
         profile: null, projects: [], experience: [], education: [], skills: [], certificates: [], gallery: []
     });
     const [loading, setLoading] = useState(true);
+    const [fetchError, setFetchError] = useState(false);
     const [lightboxImage, setLightboxImage] = useState(null);
     const [activeHighlight, setActiveHighlight] = useState(null);
 
@@ -68,48 +69,34 @@ export default function Home() {
     const [cursorHover, setCursorHover] = useState(false);
 
     useEffect(() => {
-        async function fetchData() {
+        async function loadData() {
             try {
-                const [
-                    { data: profile },
-                    { data: projects },
-                    { data: experience },
-                    { data: education },
-                    { data: skills },
-                    { data: certs },
-                    { data: gallery }
-                ] = await Promise.all([
-                    supabase.from('profiles').select('*').single(),
-                    supabase.from('projects').select('*').order('created_at', { ascending: false }),
-                    supabase.from('experience').select('*').order('created_at', { ascending: false }),
-                    supabase.from('education').select('*').order('created_at', { ascending: false }),
-                    supabase.from('skills').select('*').order('id'),
-                    supabase.from('certificates').select('*').order('created_at', { ascending: false }),
-                    supabase.from('gallery').select('*').order('created_at', { ascending: false })
-                ]);
+                const result = await fetchPortfolioData();
 
-                setData({
-                    profile: profile || {
-                        name: 'Geo Cherian Mathew',
-                        role: 'AI & IoT Developer | CSE Student',
-                        bio: "I'm a passionate Computer Science and Engineering student from India, specializing in AI, hardware-software integration, and IoT solutions. I excel at transforming complex real-world challenges into innovative, scalable prototypes that deliver measurable impact.\n\nMy expertise spans embedded systems, artificial intelligence, and full-stack development. I'm driven by the mission to build impactful solutions for agriculture, safety, healthcare, and education.",
-                        location: 'Kerala, India',
-                        email: 'geomathewprojects28@gmail.com'
-                    },
-                    projects: projects || [],
-                    experience: experience || [],
-                    education: education || [],
-                    skills: skills || [],
-                    certificates: certs || [],
-                    gallery: gallery || []
-                });
+                // Apply fallback profile if none exists
+                const profile = result.profile || {
+                    name: 'Geo Cherian Mathew',
+                    role: 'AI & IoT Developer | CSE Student',
+                    bio: "I'm a passionate Computer Science and Engineering student from India, specializing in AI, hardware-software integration, and IoT solutions. I excel at transforming complex real-world challenges into innovative, scalable prototypes that deliver measurable impact.\n\nMy expertise spans embedded systems, artificial intelligence, and full-stack development. I'm driven by the mission to build impactful solutions for agriculture, safety, healthcare, and education.",
+                    location: 'Kerala, India',
+                    email: 'geomathewprojects28@gmail.com'
+                };
+
+                setData({ ...result, profile });
+
+                // Check if everything came back empty (possible connectivity issue)
+                const allEmpty = !result.profile && result.projects.length === 0 && result.skills.length === 0;
+                if (allEmpty) {
+                    setFetchError(true);
+                }
             } catch (err) {
-                console.error('Fetch error:', err);
+                console.error('Portfolio load failed:', err);
+                setFetchError(true);
             } finally {
                 setLoading(false);
             }
         }
-        fetchData();
+        loadData();
     }, []);
 
     // Analytics Tracker
@@ -121,7 +108,7 @@ export default function Home() {
                     details: { page: 'portfolio', referrer: document.referrer, user_agent: navigator.userAgent }
                 });
             } catch (err) {
-                console.warn('Analytics skipped', err);
+                // Analytics should never block UX
             }
         };
         trackVisit();
@@ -147,7 +134,7 @@ export default function Home() {
             toast.success('Message sent! I will get back to you soon.');
             e.target.reset();
         } catch (err) {
-            toast.error('Failed to send message.');
+            toast.error('Failed to send message. Please try again.');
         }
     };
 
@@ -208,13 +195,27 @@ export default function Home() {
         <main>
             <Toaster position="bottom-right" />
 
+            {/* Connection warning banner */}
+            {fetchError && (
+                <div style={{
+                    position: 'fixed', top: 0, left: 0, right: 0, zIndex: 9999,
+                    background: 'linear-gradient(135deg, #ff6b35 0%, #f7931e 100%)',
+                    color: '#fff', padding: '10px 20px', textAlign: 'center',
+                    fontSize: '13px', fontWeight: 500, display: 'flex',
+                    alignItems: 'center', justifyContent: 'center', gap: '8px',
+                    boxShadow: '0 2px 12px rgba(0,0,0,0.15)'
+                }}>
+                    <AlertTriangle size={16} />
+                    Some data may not have loaded. The page is showing cached or default content.
+                </div>
+            )}
 
             {/* SIDEBAR */}
             <aside className={`sidebar ${isSidebarActive ? 'active' : ''}`} data-sidebar>
                 <div className="sidebar-info">
                     <figure className="avatar-box" onClick={() => setIsAvatarFlipped(!isAvatarFlipped)} style={{ cursor: 'pointer' }}>
                         <img
-                            src={isAvatarFlipped ? "/assets/images/highlights/avatar-2.png" : (getProxiedStorageUrl(data.profile?.avatar_url) || "/assets/images/geo6.jpg")}
+                            src={isAvatarFlipped ? "/assets/images/highlights/avatar-2.png" : (data.profile?.avatar_url || "/assets/images/geo6.jpg")}
                             alt={data.profile?.name || 'Profile'}
                             width="80"
                             height="80"
@@ -450,7 +451,7 @@ export default function Home() {
                                                 {p.live_link && <a href={p.live_link} target="_blank" className="project-icon-link" onClick={() => trackProjectClick(p, 'live')}><ExternalLink size={20} /></a>}
                                             </div>
                                             <img
-                                                src={getProxiedStorageUrl(p.image_url) || 'https://images.unsplash.com/photo-1518770660439-4636190af475?q=80&w=400'}
+                                                src={p.image_url || 'https://images.unsplash.com/photo-1518770660439-4636190af475?q=80&w=400'}
                                                 alt={p.title}
                                                 loading="lazy"
                                                 decoding="async"
@@ -506,10 +507,10 @@ export default function Home() {
                     <ul className="project-list">
                         {filteredCertificates.length > 0 ? (
                             filteredCertificates.map(c => (
-                                <li key={c.id} className="project-item active" onClick={() => getProxiedStorageUrl(c.image_url) && setLightboxImage(getProxiedStorageUrl(c.image_url))}>
+                                <li key={c.id} className="project-item active" onClick={() => c.image_url && setLightboxImage(c.image_url)}>
                                     <figure className="project-img" style={{ cursor: 'pointer' }}>
                                         <img
-                                            src={getProxiedStorageUrl(c.image_url) || 'https://images.unsplash.com/photo-1589330694653-ded6df03f754?q=80&w=400'}
+                                            src={c.image_url || 'https://images.unsplash.com/photo-1589330694653-ded6df03f754?q=80&w=400'}
                                             alt={c.title}
                                             loading="lazy"
                                             decoding="async"
@@ -536,10 +537,10 @@ export default function Home() {
                     <header><h2 className="h2 article-title">Gallery</h2></header>
                     <ul className="project-list">
                         {data.gallery.map(item => (
-                            <li key={item.id} className="project-item active" onClick={() => getProxiedStorageUrl(item.image_url) && setLightboxImage(getProxiedStorageUrl(item.image_url))}>
+                            <li key={item.id} className="project-item active" onClick={() => item.image_url && setLightboxImage(item.image_url)}>
                                 <figure className="project-img" style={{ cursor: 'pointer' }}>
                                     <img
-                                        src={getProxiedStorageUrl(item.image_url)}
+                                        src={item.image_url}
                                         alt={item.caption || 'Gallery'}
                                         loading="lazy"
                                         decoding="async"

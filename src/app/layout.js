@@ -10,8 +10,8 @@ export default function RootLayout({ children }) {
         <html lang="en" suppressHydrationWarning>
             <head>
                 {/* Performance: pre-establish connections */}
-                <link rel="preconnect" href="https://geodashboard.jiobase.com" />
-                <link rel="dns-prefetch" href="https://geodashboard.jiobase.com" />
+                <link rel="preconnect" href="https://gcbppyetisfunawqzzjt.supabase.co" />
+                <link rel="dns-prefetch" href="https://gcbppyetisfunawqzzjt.supabase.co" />
                 <link rel="preconnect" href="https://fonts.googleapis.com" />
                 <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
                 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
@@ -25,4 +25,3 @@ export default function RootLayout({ children }) {
         </html>
     );
 }
-
