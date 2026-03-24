@@ -272,8 +272,8 @@ article.active {
   position: absolute;
   bottom: 0;
   left: 0;
-  width: 30px;
-  height: 3px;
+  width: 50px;
+  height: 5px;
   background: var(--text-gradient-yellow);
   border-radius: 3px;
 }
@@ -2050,10 +2050,12 @@ textarea.form-input::-webkit-resizer {
   .sidebar,
   article {
     width: auto;
+    padding: 30px; 
   }
 
-  article {
-    min-height: 100%;
+  article header {
+    padding-right: 320px; 
+    margin-bottom: 25px;
   }
 
 
@@ -2090,7 +2092,7 @@ textarea.form-input::-webkit-resizer {
     height: 100%;
     margin-bottom: 0;
     padding-top: 60px;
-    z-index: 1;
+    z-index: 10;
   }
 
   .sidebar-info {
@@ -2200,10 +2202,11 @@ textarea.form-input::-webkit-resizer {
     right: 0;
     width: max-content;
     height: auto;
-    background: var(--eerie-black-2);
+    background: var(--onyx); /* Professional contrast */
     border: 1px solid var(--jet);
-    border-radius: 0 20px;
-    z-index: 5;
+    border-radius: 0 20px 0 20px;
+    padding: 0 20px;
+    z-index: 20;
     border-top: none;
     border-right: none;
   }

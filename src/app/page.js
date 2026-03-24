@@ -1,11 +1,12 @@
 'use client';
 import { useState, useEffect } from 'react';
 import { supabase, fetchPortfolioData } from '../utils/supabase';
-import {
+import { AppCore } from '../components/AppCore';
+const {
     Mail, Smartphone, Calendar, MapPin, Github, Linkedin, Instagram,
     ExternalLink, Download, BookOpen, Briefcase, Send, ChevronDown, X,
     Layout, Cpu, Globe, Server, Zap, Shield, Heart, Code, AlertTriangle
-} from 'lucide-react';
+} = AppCore;
 import { Toaster, toast } from 'react-hot-toast';
 
 const HIGHLIGHTS = [
@@ -138,6 +139,20 @@ export default function Home() {
         }
     };
 
+    const getRoleColor = (role) => {
+        switch (role?.toLowerCase()) {
+            case 'winner': return { bg: 'rgba(245, 158, 11, 0.2)', text: '#f59e0b' };
+            case 'organiser': return { bg: 'rgba(99, 102, 241, 0.2)', text: '#6366f1' };
+            case 'volunteer': return { bg: 'rgba(16, 185, 129, 0.2)', text: '#10b981' };
+            case 'participant': return { bg: 'rgba(168, 85, 247, 0.2)', text: '#a855f7' };
+            case 'self project': return { bg: 'rgba(20, 184, 166, 0.2)', text: '#14b8a6' };
+            case 'group project': return { bg: 'rgba(59, 130, 246, 0.2)', text: '#3b82f6' };
+            case 'achievement': return { bg: 'rgba(245, 158, 11, 0.15)', text: '#f59e0b' }; 
+            case 'course': return { bg: 'rgba(99, 102, 241, 0.15)', text: '#6366f1' };
+            default: return { bg: 'rgba(255, 255, 255, 0.08)', text: '#94a3b8' };
+        }
+    };
+
     if (loading) return (
         <main className="skeleton-page">
             {/* Sidebar skeleton */}
@@ -190,6 +205,93 @@ export default function Home() {
     const filteredCertificates = certificateFilter === 'all'
         ? data.certificates
         : data.certificates.filter(c => (c.category || '').toLowerCase().trim() === certificateFilter);
+
+    const renderMilestoneCard = (item, type = 'gallery') => {
+        const isGallery = type === 'gallery';
+        const isProject = type === 'project' || type === 'projects';
+        const isCertificate = type === 'certificate' || type === 'certificates';
+
+        // Unified metadata mapping
+        const title = item.title || item.name || (isGallery ? 'Untitled Milestone' : 'Achievement');
+        const year = item.year || item.date || item.issued_at || (item.created_at ? new Date(item.created_at).getFullYear() : '');
+        const organization = item.organization || item.issuer || item.institution || '';
+        
+        // Dynamic Role logic based on USER request:
+        // Certificates show CATEGORY in role slot. Projects show ROLE (Project Type).
+        const role = isCertificate ? item.category : (item.role || (isProject ? 'Self Project' : ''));
+        const roleStyles = getRoleColor(role);
+        
+        const category = isCertificate ? '' : item.category; // Category is already in role slot for certs
+        const description = item.description || item.caption || '';
+        const image = item.image_url || item.thumbnail_url || (isProject ? 'https://images.unsplash.com/photo-1518770660439-4636190af475?q=80&w=400' : 'https://images.unsplash.com/photo-1589330694653-ded6df03f754?q=80&w=400');
+        const contributors = item.contributors || '';
+
+        return (
+            <li key={item.id} className="project-item active" style={{ height: 'auto', borderRadius: '16px', overflow: 'hidden' }}>
+                <div style={{ position: 'relative', width: '100%', height: '100%', background: 'var(--eerie-black-1)', border: '1px solid var(--jet)', borderRadius: '16px', paddingBottom: '15px' }}>
+                    <figure className="project-img" style={{ cursor: 'pointer', margin: 0, borderRadius: '16px 16px 0 0' }} onClick={() => image && setLightboxImage(image)}>
+                        <div className="project-icons">
+                            {isProject && item.github_link && <a href={item.github_link} target="_blank" className="project-icon-link" onClick={(e) => { e.stopPropagation(); trackProjectClick(item, 'github'); }}><Github size={18} /></a>}
+                            {isProject && item.live_link && <a href={item.live_link} target="_blank" className="project-icon-link" onClick={(e) => { e.stopPropagation(); trackProjectClick(item, 'live'); }}><ExternalLink size={18} /></a>}
+                            {!isProject && <ExternalLink size={20} />}
+                        </div>
+                        <img
+                            src={image}
+                            alt={title}
+                            loading="lazy"
+                            decoding="async"
+                            className="img-lazy"
+                            style={{ aspectRatio: '16/10', objectFit: 'cover' }}
+                            onLoad={(e) => e.currentTarget.classList.add('loaded')}
+                            onError={(e) => { e.currentTarget.style.display = 'none'; }}
+                        />
+                    </figure>
+
+                    <div style={{ padding: '15px 15px 0' }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '8px', gap: '8px' }}>
+                            <h3 className="project-title" style={{ margin: 0, fontSize: '15px', color: 'var(--white-2)', lineHeight: '1.4' }}>{title}</h3>
+                            {year && <span style={{ fontSize: '11px', fontWeight: 800, color: 'var(--orange-yellow-crayola)', opacity: 0.8 }}>{year}</span>}
+                        </div>
+
+                        {organization && (
+                            <p style={{ color: 'var(--light-gray-70)', fontSize: '13px', marginBottom: '10px', display: 'flex', alignItems: 'center', gap: '5px' }}>
+                                <Briefcase size={12} /> {organization}
+                            </p>
+                        )}
+
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                            <div style={{
+                                background: role ? roleStyles.bg : 'transparent',
+                                color: role ? roleStyles.text : 'transparent',
+                                padding: role ? '3px 10px' : '0', // Slightly increased padding for premium feel
+                                borderRadius: '4px',
+                                fontSize: '9px',
+                                fontWeight: 800,
+                                textTransform: 'uppercase',
+                                letterSpacing: '0.6px'
+                            }}>
+                                {role}
+                            </div>
+                            {category && <span style={{ fontSize: '10px', color: 'var(--light-gray-70)', opacity: 0.5 }}>{category}</span>}
+                        </div>
+
+                        {isProject && contributors && (
+                            <div style={{ marginTop: '15px', padding: '12px', background: 'rgba(255,255,255,0.03)', borderRadius: '10px', border: '1px solid rgba(255,255,255,0.05)' }}>
+                                <div style={{ fontSize: '9px', textTransform: 'uppercase', color: 'var(--orange-yellow-crayola)', opacity: 0.7, marginBottom: '6px', fontWeight: 800, letterSpacing: '1px' }}>Stakeholders & Contributors</div>
+                                <p style={{ fontSize: '13px', color: 'var(--light-gray-70)', fontStyle: 'italic', fontWeight: 500 }}>{contributors}</p>
+                            </div>
+                        )}
+
+                        {description && (
+                            <p style={{ marginTop: '12px', fontSize: '12px', color: 'var(--light-gray-70)', lineHeight: '1.5', display: '-webkit-box', WebkitLineClamp: '2', WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
+                                {description}
+                            </p>
+                        )}
+                    </div>
+                </div>
+            </li>
+        );
+    };
 
     return (
         <main>
@@ -363,17 +465,40 @@ export default function Home() {
                                 <div className="icon-box"><BookOpen size={18} /></div>
                                 <h3 className="h3">Education</h3>
                             </div>
-                            <a href="/assets/files/Geo_Cherian_Mathew_Resume.pdf" download="Geo_Cherian_Mathew_Resume.pdf" className="download-btn">
-                                <Download size={16} /> <span>Download Resume</span>
-                            </a>
+                            {data.profile?.resume_url && (
+                                <a 
+                                    href={`${data.profile.resume_url}?t=${new Date(data.profile.updated_at).getTime()}`} 
+                                    download={`Geo_Cherian_Mathew_Resume_${new Date().getFullYear()}.pdf`} 
+                                    className="download-btn"
+                                >
+                                    <Download size={16} /> <span>Download Resume</span>
+                                </a>
+                            )}
                         </div>
                         <ol className="timeline-list">
                             {data.education.length > 0 ? (
                                 data.education.map(edu => (
-                                    <li key={edu.id} className="timeline-item">
-                                        <h4 className="h4 timeline-item-title">{edu.degree}</h4>
-                                        <span>{edu.duration} • {edu.institution}</span>
-                                        <p className="timeline-text">{edu.description}</p>
+                                    <li key={edu.id} className="timeline-item" style={{ marginBottom: '35px' }}>
+                                        <div style={{ display: 'flex', alignItems: 'center', gap: '15px', marginBottom: '10px' }}>
+                                            <div style={{ 
+                                                width: '42px', height: '42px', borderRadius: '10px', overflow: 'hidden', 
+                                                flexShrink: 0, background: '#fff', border: '1px solid rgba(255,255,255,0.1)',
+                                                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                                boxShadow: '0 4px 10px rgba(0,0,0,0.3)', position: 'relative', zIndex: 10
+                                            }}>
+                                                {edu.logo_url ? (
+                                                    <img src={edu.logo_url} style={{ width: '85%', height: '85%', objectFit: 'contain' }} />
+                                                ) : (
+                                                    <BookOpen size={20} color="#000" />
+                                                )}
+                                            </div>
+                                            <div>
+                                                <h4 className="h4 timeline-item-title" style={{ margin: 0, fontSize: '15px' }}>{edu.degree}</h4>
+                                                <span style={{ fontSize: '13px', color: 'var(--vegas-gold)' }}>{edu.institution}</span>
+                                            </div>
+                                        </div>
+                                        <span style={{ display: 'block', fontSize: '12px', opacity: 0.6, marginBottom: '8px', marginLeft: '57px' }}>{edu.duration}</span>
+                                        <p className="timeline-text" style={{ marginLeft: '57px' }}>{edu.description}</p>
                                     </li>
                                 ))
                             ) : (
@@ -387,10 +512,27 @@ export default function Home() {
                         <div className="title-wrapper"><div className="icon-box"><Briefcase size={18} /></div><h3 className="h3">Experience</h3></div>
                         <ol className="timeline-list">
                             {data.experience.map(exp => (
-                                <li key={exp.id} className="timeline-item">
-                                    <h4 className="h4 timeline-item-title">{exp.role}</h4>
-                                    <span>{exp.duration} • {exp.organization}</span>
-                                    <p className="timeline-text">{exp.description}</p>
+                                <li key={exp.id} className="timeline-item" style={{ marginBottom: '35px' }}>
+                                    <div style={{ display: 'flex', alignItems: 'center', gap: '15px', marginBottom: '10px' }}>
+                                        <div style={{ 
+                                            width: '42px', height: '42px', borderRadius: '10px', overflow: 'hidden', 
+                                            flexShrink: 0, background: '#fff', border: '1px solid rgba(255,255,255,0.1)',
+                                            display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                            boxShadow: '0 4px 10px rgba(0,0,0,0.3)', position: 'relative', zIndex: 10
+                                        }}>
+                                            {exp.logo_url ? (
+                                                <img src={exp.logo_url} style={{ width: '85%', height: '85%', objectFit: 'contain' }} />
+                                            ) : (
+                                                <Briefcase size={20} color="#000" />
+                                            )}
+                                        </div>
+                                        <div>
+                                            <h4 className="h4 timeline-item-title" style={{ margin: 0, fontSize: '15px' }}>{exp.role}</h4>
+                                            <span style={{ fontSize: '13px', color: 'var(--vegas-gold)' }}>{exp.organization}</span>
+                                        </div>
+                                    </div>
+                                    <span style={{ display: 'block', fontSize: '12px', opacity: 0.6, marginBottom: '8px', marginLeft: '57px' }}>{exp.duration}</span>
+                                    <p className="timeline-text" style={{ marginLeft: '57px' }}>{exp.description}</p>
                                 </li>
                             ))}
                         </ol>
@@ -442,29 +584,7 @@ export default function Home() {
 
                     <ul className="project-list">
                         {filteredProjects.length > 0 ? (
-                            filteredProjects.map(p => (
-                                <li key={p.id} className="project-item active">
-                                    <div style={{ position: 'relative' }}>
-                                        <figure className="project-img">
-                                            <div className="project-icons">
-                                                {p.github_link && <a href={p.github_link} target="_blank" className="project-icon-link" onClick={() => trackProjectClick(p, 'github')}><Github size={20} /></a>}
-                                                {p.live_link && <a href={p.live_link} target="_blank" className="project-icon-link" onClick={() => trackProjectClick(p, 'live')}><ExternalLink size={20} /></a>}
-                                            </div>
-                                            <img
-                                                src={p.image_url || 'https://images.unsplash.com/photo-1518770660439-4636190af475?q=80&w=400'}
-                                                alt={p.title}
-                                                loading="lazy"
-                                                decoding="async"
-                                                className="img-lazy"
-                                                onLoad={(e) => e.currentTarget.classList.add('loaded')}
-                                                onError={(e) => { e.currentTarget.src = 'https://images.unsplash.com/photo-1518770660439-4636190af475?q=80&w=400'; e.currentTarget.classList.add('loaded'); }}
-                                            />
-                                        </figure>
-                                        <h3 className="project-title">{p.title}</h3>
-                                        <p className="project-category">{p.description || p.category}</p>
-                                    </div>
-                                </li>
-                            ))
+                            filteredProjects.map(p => renderMilestoneCard(p, 'project'))
                         ) : (
                             <li className="project-item active" style={{ gridColumn: '1 / -1', textAlign: 'center', padding: '40px', color: 'var(--light-gray-70)' }}>
                                 <div className="icon-box" style={{ margin: '0 auto 15px' }}><Layout size={24} /></div>
@@ -506,23 +626,7 @@ export default function Home() {
 
                     <ul className="project-list">
                         {filteredCertificates.length > 0 ? (
-                            filteredCertificates.map(c => (
-                                <li key={c.id} className="project-item active" onClick={() => c.image_url && setLightboxImage(c.image_url)}>
-                                    <figure className="project-img" style={{ cursor: 'pointer' }}>
-                                        <img
-                                            src={c.image_url || 'https://images.unsplash.com/photo-1589330694653-ded6df03f754?q=80&w=400'}
-                                            alt={c.title}
-                                            loading="lazy"
-                                            decoding="async"
-                                            className="img-lazy"
-                                            onLoad={(e) => e.currentTarget.classList.add('loaded')}
-                                            onError={(e) => { e.currentTarget.src = 'https://images.unsplash.com/photo-1589330694653-ded6df03f754?q=80&w=400'; e.currentTarget.classList.add('loaded'); }}
-                                        />
-                                    </figure>
-                                    <h3 className="project-title">{c.title}</h3>
-                                    <p className="project-category">{c.description || c.issuer}</p>
-                                </li>
-                            ))
+                            filteredCertificates.map(c => renderMilestoneCard(c, 'certificate'))
                         ) : (
                             <li className="project-item active" style={{ gridColumn: '1 / -1', textAlign: 'center', padding: '40px', color: 'var(--light-gray-70)' }}>
                                 <div className="icon-box" style={{ margin: '0 auto 15px' }}><Shield size={24} /></div>
@@ -535,22 +639,11 @@ export default function Home() {
                 {/* GALLERY */}
                 <article className={`gallery ${activeTab === 'Gallery' ? 'active' : ''}`} data-page="gallery">
                     <header><h2 className="h2 article-title">Gallery</h2></header>
+                    <p style={{ color: 'var(--light-gray-70)', fontSize: '14px', marginBottom: '25px', lineHeight: '1.6' }}>
+                        A strategic chronicle of my high-fidelity professional achievements and accolades.
+                    </p>
                     <ul className="project-list">
-                        {data.gallery.map(item => (
-                            <li key={item.id} className="project-item active" onClick={() => item.image_url && setLightboxImage(item.image_url)}>
-                                <figure className="project-img" style={{ cursor: 'pointer' }}>
-                                    <img
-                                        src={item.image_url}
-                                        alt={item.caption || 'Gallery'}
-                                        loading="lazy"
-                                        decoding="async"
-                                        className="img-lazy"
-                                        onLoad={(e) => e.currentTarget.classList.add('loaded')}
-                                        onError={(e) => { e.currentTarget.style.display = 'none'; }}
-                                    />
-                                </figure>
-                            </li>
-                        ))}
+                        {data.gallery.map(item => renderMilestoneCard(item, 'gallery'))}
                     </ul>
                 </article>
 

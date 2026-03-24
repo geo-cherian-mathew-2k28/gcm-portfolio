@@ -97,9 +97,9 @@ export async function fetchPortfolioData() {
             galleryRes,
         ] = await Promise.allSettled([
             withRetry(() => supabase.from('profiles').select('*').single()),
-            withRetry(() => supabase.from('projects').select('*').order('created_at', { ascending: false })),
-            withRetry(() => supabase.from('experience').select('*').order('created_at', { ascending: false })),
-            withRetry(() => supabase.from('education').select('*').order('created_at', { ascending: false })),
+            withRetry(() => supabase.from('projects').select('id, title, description, ai_description, category, image_url, extra_images, github_link, live_link, tech_stack, role, contributors, created_at').order('created_at', { ascending: false })),
+            withRetry(() => supabase.from('experience').select('*').order('order', { ascending: false })),
+            withRetry(() => supabase.from('education').select('*').order('order', { ascending: false })),
             withRetry(() => supabase.from('skills').select('*').order('id')),
             withRetry(() => supabase.from('certificates').select('*').order('created_at', { ascending: false })),
             withRetry(() => supabase.from('gallery').select('*').order('created_at', { ascending: false })),
