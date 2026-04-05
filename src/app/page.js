@@ -538,17 +538,88 @@ export default function Home() {
                         </ol>
                     </section>
                     <section className="skill">
-                        <h3 className="h3 skills-title">Technical Proficiency</h3>
-                        <ul className="skills-list content-card">
-                            {data.skills.map(skill => (
-                                <li key={skill.id} className="skills-item">
-                                    <div className="skill">
-                                        <div className="title-wrapper"><h5 className="h5">{skill.name}</h5><data value={skill.level}>{skill.level}%</data></div>
-                                        <div className="skill-progress-bg"><div className="skill-progress-fill" style={{ width: `${skill.level}%` }}></div></div>
-                                    </div>
-                                </li>
-                            ))}
-                        </ul>
+                        <h2 className="h2 skills-title" style={{ fontSize: '24px', marginBottom: '30px' }}>Technologies I Use</h2>
+                        
+                        {/* 1. Core Proficiencies */}
+                        <div style={{ marginBottom: '45px' }}>
+                            <h3 className="h4" style={{ color: 'var(--orange-yellow-crayola)', marginBottom: '20px', fontSize: '18px' }}>Core Proficiencies</h3>
+                            <ul className="skills-list content-card">
+                                {data.skills.filter(s => s.level != null && s.level > 0).map(skill => (
+                                    <li key={skill.id} className="skills-item">
+                                        <div className="skill">
+                                            <div className="title-wrapper"><h5 className="h5">{skill.name}</h5><data value={skill.level}>{skill.level}%</data></div>
+                                            <div className="skill-progress-bg"><div className="skill-progress-fill" style={{ width: `${skill.level}%` }}></div></div>
+                                        </div>
+                                    </li>
+                                ))}
+                                {data.skills.filter(s => s.level != null && s.level > 0).length === 0 && (
+                                    <li className="skills-item" style={{ textAlign: 'center', color: 'var(--light-gray-70)', opacity: 0.5 }}>Define Core Proficiencies in dashboard.</li>
+                                )}
+                            </ul>
+                        </div>
+
+                        {/* 2. Tech Arsenal */}
+                        <div>
+                            <h3 className="h4" style={{ color: 'var(--orange-yellow-crayola)', marginBottom: '25px', fontSize: '18px' }}>Technology Arsenal</h3>
+                            
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: '30px' }}>
+                                {['Backend', 'Frontend', 'Tools', 'Hardware'].map(cat => {
+                                    const parseTechStack = (ts) => {
+                                        if (!ts) return [];
+                                        try {
+                                            if (Array.isArray(ts)) return ts.map(s => String(s).trim()).filter(Boolean);
+                                            if (typeof ts === 'string') return ts.split(',').map(s => s.trim()).filter(Boolean);
+                                            if (typeof ts === 'object' && ts !== null) return Object.values(ts).map(s => String(s).trim()).filter(Boolean);
+                                            return [];
+                                        } catch { return []; }
+                                    };
+
+                                    const namesFromSkills = data.skills
+                                        .filter(s => s.category === cat && (s.level == null || s.level === 0))
+                                        .map(s => s.name);
+
+                                    const namesFromProjects = (cat === 'Tools' && data?.projects?.length > 0) 
+                                        ? data.projects.flatMap(p => parseTechStack(p?.tech_stack))
+                                        : [];
+                                    
+                                    const allTechUnique = [...new Set([...namesFromSkills, ...namesFromProjects])]
+                                        .filter(t => t && typeof t === 'string' && t.trim() !== '');
+
+                                    if (allTechUnique.length === 0) return null;
+
+                                    return (
+                                        <div key={cat} style={{ marginBottom: '10px' }}>
+                                            <h4 style={{ fontSize: '14px', fontWeight: '800', color: 'rgba(255,255,255,0.4)', textTransform: 'uppercase', letterSpacing: '1px', marginBottom: '15px' }}>{cat}</h4>
+                                            <div style={{ width: '100%', height: '1.5px', background: 'rgba(255,255,255,0.04)', marginBottom: '20px' }}></div>
+
+                                            {/* TECH GRID */}
+                                            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '12px' }}>
+                                                {allTechUnique.map(tech => (
+                                                    <div 
+                                                        key={tech} 
+                                                        style={{ 
+                                                            padding: '10px 18px', background: 'var(--eerie-black-2)', 
+                                                            border: '1px solid var(--jet)', borderRadius: '10px',
+                                                            transition: 'all 0.3s ease', cursor: 'default'
+                                                        }}
+                                                        onMouseOver={(e) => {
+                                                            e.currentTarget.style.borderColor = 'var(--orange-yellow-crayola)';
+                                                            e.currentTarget.style.boxShadow = '0 0 15px rgba(255, 209, 92, 0.15)';
+                                                        }}
+                                                        onMouseOut={(e) => {
+                                                            e.currentTarget.style.borderColor = 'var(--jet)';
+                                                            e.currentTarget.style.boxShadow = 'none';
+                                                        }}
+                                                    >
+                                                        <span style={{ fontSize: '13px', fontWeight: '700', color: 'var(--white-2)' }}>{tech}</span>
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        </div>
+                                    );
+                                })}
+                            </div>
+                        </div>
                     </section>
                 </article>
 
